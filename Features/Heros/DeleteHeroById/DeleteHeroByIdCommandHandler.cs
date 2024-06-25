@@ -1,25 +1,26 @@
-﻿using Learn_CQRS.Data;
+﻿using Learn_CQRS.Core.IConfiguration;
 using MediatR;
 
 namespace Learn_CQRS.Features.Heros.DeleteHeroById
 {
     public class DeleteHeroByIdCommandHandler : IRequestHandler<DeleteHeroByIdCommand, bool>
     {
-        private readonly HeroDbContext _dbContext;
-        public DeleteHeroByIdCommandHandler(HeroDbContext dbContext)
+        private readonly IUnitOfWork _unitOfWork;
+        public DeleteHeroByIdCommandHandler(IUnitOfWork unitOfWork)
         {
-            _dbContext = dbContext;
+            _unitOfWork = unitOfWork;
         }
         public async Task<bool> Handle(DeleteHeroByIdCommand request, CancellationToken cancellationToken)
         {
-            var deletedHero = await _dbContext
-                                            .Heroes
-                                            .FindAsync(new object?[] { request.heroId }, cancellationToken);
+            var deletedHero = await _unitOfWork
+                                               .Heros
+                                               .GetById(request.heroId, cancellationToken);
             if (deletedHero is null) return false;
-            _dbContext
-                    .Heroes
-                    .Remove(deletedHero);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            _unitOfWork
+                      .Heros
+                      .Delete(deletedHero);
+            await _unitOfWork
+                            .CompleteAsync(cancellationToken);
             return true;
         }
     }

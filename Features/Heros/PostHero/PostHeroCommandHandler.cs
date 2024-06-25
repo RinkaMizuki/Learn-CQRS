@@ -1,25 +1,25 @@
-﻿using Learn_CQRS.Data;
+﻿using AutoMapper;
+using Learn_CQRS.Core.IConfiguration;
 using Learn_CQRS.Entities;
 using MediatR;
 
 namespace Learn_CQRS.Features.Heros.PostHero
 {
-    public class PostHeroCommandHandler : IRequestHandler<PostHeroCommand, int>
+    public class PostHeroCommandHandler : IRequestHandler<PostHeroCommand, Hero>
     {
-        private readonly HeroDbContext _dbContext;
-        public PostHeroCommandHandler(HeroDbContext dbContext)
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
+        public PostHeroCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _dbContext = dbContext;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
-        public async Task<int> Handle(PostHeroCommand request, CancellationToken cancellationToken)
+        public async Task<Hero> Handle(PostHeroCommand request, CancellationToken cancellationToken)
         {
-            var newHero = new Hero { Level = request.level, Name = request.name };
-            await _dbContext
-                           .Heroes
-                           .AddAsync(newHero, cancellationToken);
-            await _dbContext
-                            .SaveChangesAsync(cancellationToken);
-            return newHero.Id;
+            var mapperHero = _mapper.Map<Hero>(request);
+            var newHero = await _unitOfWork.Heros.Add(mapperHero, cancellationToken);
+            await _unitOfWork.CompleteAsync(cancellationToken);
+            return newHero;
         }
     }
 }

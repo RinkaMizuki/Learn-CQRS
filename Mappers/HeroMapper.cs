@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Learn_CQRS.Entities;
+using Learn_CQRS.Features.Heros.PostHero;
 using Learn_CQRS.Features.Heros.UpdateHeroById;
 
 namespace Learn_CQRS.Mappers
@@ -10,6 +11,8 @@ namespace Learn_CQRS.Mappers
         {
             CreateMap<UpdateHeroByIdCommand, Hero>()
                     .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.heroId));
+            CreateMap<PostHeroCommand, Hero>()
+                    .ForMember(dest => dest.Id, opt => opt.MapFrom(src => 0));
         }
     }
 }

@@ -1,4 +1,7 @@
+using Learn_CQRS.Core.IConfiguration;
+using Learn_CQRS.Core.Repositories;
 using Learn_CQRS.Data;
+using Learn_CQRS.Datas;
 
 namespace Learn_CQRS
 {
@@ -15,10 +18,10 @@ namespace Learn_CQRS
             });
             builder.Services.AddAutoMapper(typeof(Program).Assembly);
             builder.Services.AddControllers();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

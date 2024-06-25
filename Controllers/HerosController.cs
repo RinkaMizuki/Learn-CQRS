@@ -19,11 +19,12 @@ namespace Learn_CQRS.Controllers
         [HttpPost]
         public async Task<IActionResult> PostHero([FromBody]PostHeroCommand request, CancellationToken cancellationToken)
         {
-            var heroId = await _sender.Send(request, cancellationToken);
+            var newHero = await _sender.Send(request, cancellationToken);
             return StatusCode(201, new
             {
                 message = "Create hero successfully.",
-                heroId,
+                statusCode = 201,
+                hero = newHero
             });
         }
         [HttpGet]
@@ -37,7 +38,8 @@ namespace Learn_CQRS.Controllers
             return StatusCode(200, new
             {
                 message = "Get hero successfully.",
-                hero,
+                statusCode = 200,
+                hero
             });
         }
         [HttpDelete]
@@ -56,19 +58,12 @@ namespace Learn_CQRS.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateHeroById([FromBody]UpdateHeroByIdCommand request, CancellationToken cancellationToken)
         {
-            var isSuccess = await _sender.Send(request, cancellationToken);
-            if (!isSuccess)
-            {
-                return StatusCode(404, new
-                {
-                    message = "Hero not found.",
-                    statusCode = 404
-                });
-            }
+            var updatedHero = await _sender.Send(request, cancellationToken);
             return StatusCode(200, new
             {
                 message = "Update hero successfully.",
-                statusCode = 200
+                statusCode = 200,
+                hero = updatedHero
             });
         }
     }
